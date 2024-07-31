@@ -11,27 +11,27 @@ const PER_PAGE = 9;
 
 const EventList = () => {
   const { data, error } = useData();
-  const [type, setType] = useState();
+  const [type, setType] = useState(null); // On passe de létat undefini à null pour indiquer qu'aucun type est séléctioné
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Filtrer en fonction du type séléctionné
   const filteredEvents = (
-    (!type
-      ? data?.events
-      : data?.events) || []
-  ).filter((event, index) => {
-    if (
-      (currentPage - 1) * PER_PAGE <= index &&
-      PER_PAGE * currentPage > index
-    ) {
-      return true;
-    }
-    return false;
-  });
+    (data?.events) || []
+  ).filter((event) =>  !type  || event.type === type
+    
+  );
+   // Pagination des évènements filtrés
+  const paginatedEvents = filteredEvents.slice(
+    (currentPage - 1)* PER_PAGE, currentPage * PER_PAGE); // Calcule les évènements à afficher par page
+      
   const changeType = (evtType) => {
     setCurrentPage(1);
     setType(evtType);
   };
-  const pageNumber = Math.floor((filteredEvents?.length || 0) / PER_PAGE) + 1;
+  // Calcul du nb de pages
+  const pageNumber = Math.ceil(filteredEvents.length/ PER_PAGE);
   const typeList = new Set(data?.events.map((event) => event.type));
+
   return (
     <>
       {error && <div>An error occured</div>}
@@ -42,10 +42,10 @@ const EventList = () => {
           <h3 className="SelectTitle">Catégories</h3>
           <Select
             selection={Array.from(typeList)}
-            onChange={(value) => (value ? changeType(value) : changeType(null))}
+            onChange={(value) =>  changeType(value || null)}
           />
           <div id="events" className="ListContainer">
-            {filteredEvents.map((event) => (
+            {paginatedEvents.map((event) => (
               <Modal key={event.id} Content={<ModalEvent event={event} />}>
                 {({ setIsOpened }) => (
                   <EventCard
