@@ -20,6 +20,7 @@ const EventList = () => {
   ).filter((event) =>  !type  || event.type === type
     
   );
+  filteredEvents.sort((eventA, eventB) => new Date(eventB.date) - new Date(eventA.date)); // compare et tri par date décroissante
    // Pagination des évènements filtrés
   const paginatedEvents = filteredEvents.slice(
     (currentPage - 1)* PER_PAGE, currentPage * PER_PAGE); // Calcule les évènements à afficher par page
